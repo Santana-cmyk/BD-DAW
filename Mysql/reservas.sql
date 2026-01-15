@@ -63,6 +63,110 @@ SELECT REVERSE('AGALAM');
 SELECT sysdate();
 SELECT NOW();
 SELECT ROUND(235.415, 2);
+
+-- Opcion 1: Usando DATE_ADD
+SELECT * FROM usuarios
+WHERE fecha_nacimiento >= '2013-01-01' AND fecha_nacimiento < DATE_ADD('2013-01-01', INTERVAL 1 YEAR)
+ORDER BY fecha_nacimiento;
+
+-- opcion 2: Forma simplificada 
+SELECT * FROM usuarios
+WHERE fecha_nacimiento >= '2013-01-01' AND fecha_nacimiento < '2013-01-01'+ INTERVAL 1 YEAR
+ORDER BY fecha_nacimiento;
+
+-- Muestra el resultado de sumar 12 meses o 365 días a la fecha indica
+SELECT DATE_ADD('2013-01-01', INTERVAL 12 MONTH);
+SELECT '2013-01-01' + INTERVAL 12 MONTH;
+SELECT '2013-01-01' + INTERVAL 365 DAY;
+
+-- Muestra la diferencia en días entre las dos fechas indicadas
+SELECT datediff('2022-02-23', '2022-01-01');
+SELECT DATEDIFF('2022-01-01', '2022-02-23');
+
+-- CONSULTAS DE RESUMEN USANDO GROUP BY
+-- Número de polideportivos en cada ciudad
+SELECT ciudad, count(*) N_polideportivos
+FROM polideportivos
+GROUP BY ciudad
+ORDER BY ciudad;
+
+SELECT ciudad, count(*) nº_usuarios
+FROM usuarios
+GROUP BY ciudad
+ORDER BY ciudad;
+
+SELECT ciudad, count(*) N_polideportivos
+FROM polideportivos
+GROUP BY ciudad
+ORDER BY ciudad;
+
+SELECT ciudad, COUNT(*) AS N_polideportivos
+FROM polideportivos
+GROUP BY ciudad
+-- NO podemos utilizar la funcion WHERE para GROUP, saltará un error. Debemos utiliza HAVING
+HAVING COUNT(*) > 10
+ORDER BY ciudad;
+
+-- ¿ Cuántas pistas de cada deporte hay?
+SELECT tipo, COUNT(*) AS N_pistas
+FROM pistas
+GROUP BY tipo
+ORDER BY tipo;
+
+-- ¿ Cuántas pistas de cada deporte hay, pero solo muéstrame los deportes con más de 50 pistas?
+SELECT tipo, COUNT(*) AS N_pistas
+FROM pistas
+GROUP BY tipo
+HAVING COUNT(*) > 50
+ORDER BY tipo;
+
+-- Quiero saber el precio promedio de cada tipo de pista
+SELECT tipo, ROUND(AVG(precio), 2) AS media_precio ,COUNT(*) AS N_pistas
+FROM pistas
+GROUP BY tipo
+ORDER BY tipo;
+
+-- Quiero saber los tipos de pistas que tienen un precio medio mayor a 9€
+SELECT tipo, ROUND(AVG(precio), 2) AS media_precio, COUNT(*) AS N_pistas 
+FROM pistas
+GROUP BY tipo
+HAVING AVG(precio) > 9
+ORDER BY tipo;
+
+-- ¿Cual es el tipo de pista más barata?
+SELECT tipo, MIN(precio)
+ AS Precio 
+FROM pistas
+GROUP BY tipo
+ORDER BY MIN(precio)
+LIMIT 1;
+
+-- ¿Cual es el tipo de pista más caro?
+SELECT tipo, MAX(precio)
+ AS Precio 
+FROM pistas
+GROUP BY tipo
+ORDER BY MAX(precio) DESC;
+
+-- Mostramos la info de las pistas con sus reservas
+SELECT pistas.id 'pistas_id', codigo, tipo, reservas.id 'reservas_id',
+fecha_reserva, fecha_uso
+FROM pistas, reservas
+WHERE pistas.id = reservas.id_pista
+ORDER BY pistas.id;
+
+-- Muestram toda la info de los usuarios que hicieron alguna reservas
+SELECT pistas.id 'pistas_id', codigo, tipo,nombre,apellidos,dni,ciudad,fecha_nacimiento,asiste, reservas.id 'reservas_id',
+fecha_reserva, fecha_uso
+FROM pistas, reservas,usuarios,usuario_reserva
+WHERE usuarios.id = usuario_reserva.id_usuario
+ORDER BY apellidos ,nombre;
+
+-- Mostrar toda la informacion de los polideportivos junto con las pistas
+-- que tienen cada uno de ellos
+SELECT * FROM polideportivos, pistas
+WHERE polideportivos.id = pistas.id_polideportivo
+ORDER BY ciudad;
 -- SQLINES DEMO *** --------------------------------------- 
 
 --
