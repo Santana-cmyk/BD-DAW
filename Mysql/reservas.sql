@@ -167,6 +167,76 @@ ORDER BY apellidos ,nombre;
 SELECT * FROM polideportivos, pistas
 WHERE polideportivos.id = pistas.id_polideportivo
 ORDER BY ciudad;
+
+
+-- SUBCONSULTAS
+-- Son consultas anidadas dentro de otra sentencia SQL
+-- (SELECT, INSERT, UPDATE o DELETE).
+
+-- Ejercicio 1: Obtener todas las pistas cuyo precio sea superior al
+-- precio medio de todas las pistas
+SELECT * FROM pistas
+WHERE precio > (SELECT AVG(precio) FROM pistas);
+
+-- Ejercicio 2: Listar los usuarios que viven en la misma ciudad que el usuario
+-- con ID 1.
+SELECT * FROM usuarios 
+WHERE ciudad = (SELECT ciudad FROM usuarios WHERE id = 1);
+
+-- Ejercicio 3: Mostrar los polideportivos situados en la misma ciudad 
+-- donde se encuentra el polideportivo 'San jose'
+SELECT * FROM polideportivos
+WHERE ciudad = (SELECT ciudad FROM polideportivos WHERE nombre = 'San José');
+
+-- SUBCONSULTAS de resultado único
+-- Estas subconsultas devuelven una sola fila y una sola fila y una sola columna
+-- Se usan con operadores de comparación estándar (=, <,>, <=, >=, !=)
+
+-- Ejercicio 1: Obtener el código, tipo y precio de la pista más cara
+SELECT codigo, tipo, precio FROM pistas
+WHERE precio = (SELECT MAX(precio) FROM pistas);
+
+-- Ejercicio 2: Mostrar los datos del usuario que realizó la primera reserva
+-- registrada (la de ID más bajo)
+SELECT * FROM usuarios
+WHERE id = (SELECT id_usuario FROM usuario_reserva ORDER BY id_reserva ASC LIMIT 1);
+
+-- Ejercicio 3: Listar las pistas del mismo tipo que la pista con codigo 'MUVF2634'
+SELECT * FROM pistas 
+WHERE tipo =  (SELECT tipo FROM pistas WHERE codigo = 'MUVF2634' );
+
+-- SUBCONSULTAS DE LISTAS DE VALORES
+-- El operador IN con subconsulta
+-- Se usa cuando la subconsulta devuelve una columna pero varias filas.
+
+-- Ejercicio 1: Listar los nombres y apellidos de los usuarios 
+-- que han realizado alguna reserva.
+SELECT nombre , apellidos  FROM usuarios 
+WHERE id IN (SELECT id_usuario FROM usuario_reserva);
+
+-- Ejercicio 2: Mostrar los polideportivos que tienen pistas de tipo 'tenis'.
+SELECT * FROM polideportivos
+WHERE id IN (SELECT id_polideportivo FROM pistas WHERE tipo = 'tenis');
+
+-- Ejercicio 3: Obtener los datos de las pistas que han estado 
+-- cerradas alguna vez.
+SELECT * FROM pistas
+WHERE id IN (SELECT id_pista FROM pistas_cerradas);
+
+-- 3.2 La comparación modificada (ANY, ALL)
+-- 3.2.1 El test ANY
+-- Devuelve verdadero si la comparación es cierta para al menor uno
+-- de los valores de la lista
+
+-- Ejercicio 1: Buscar pistas que sean mas baratas 
+-- que alguna de las pistas del polideportivo con ID 1
+SELECT * FROM pistas
+WHERE  precio < ANY (SELECT precio FROM pistas WHERE id_polideportivo = 1);
+
+-- Ejercicio 2: Listar usuarios cuyo ID sea mayor que alguno de los
+-- usuarios de la ciudad de Huesca
+SELECT * FROM usuarios
+WHERE id > ANY (SELECT id FROM usuarios WHERE ciudad = 'Huesca');
 -- SQLINES DEMO *** --------------------------------------- 
 
 --
